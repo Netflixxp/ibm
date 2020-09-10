@@ -7,36 +7,34 @@ fi
 rm -rf cloudfoundry
 mkdir cloudfoundry
 cd cloudfoundry
-mkdir Godeps
-echo '{'>>Godeps/Godeps.json
-echo '	"ImportPath": "main",'>>Godeps/Godeps.json
-echo '	"GoVersion": "go1",'>>Godeps/Godeps.json
-echo '	"Deps": []'>>Godeps/Godeps.json
-echo '}'>>Godeps/Godeps.json
-echo 'package main'>>main.go
-echo 'func main() {'>>main.go
-echo '}'>>main.go
-echo '#!/bin/bash'>>start.sh
-echo 'cd v2ray'>>start.sh
-echo './v2ray&'>>start.sh
-echo 'sleep 9d'>>start.sh
-echo 'kill -9 $(ps -ef|grep v2ray|grep -v grep|awk "'"{print \$2}"'")'>>start.sh
-echo 'web: ./start.sh'>Procfile
+
+echo '<!DOCTYPE html> '>>index.php
+echo '<html> '>>index.php
+echo '<body>'>>index.php
+echo '<?php '>>index.php
+echo 'echo "Hello World!"; '>>index.php
+echo '?> '>>index.php
+echo '<body>'>>index.php
+echo '</html>'>>index.php
+
 wget https://github.com/v2ray/v2ray-core/releases/latest/download/v2ray-linux-64.zip
-unzip -d v2ray v2ray-linux-64.zip
-cd v2ray
+unzip -d v2ray1 v2ray-linux-64.zip
+cd v2ray1
 chmod 777 *
 cd ..
 rm -rf v2ray-linux-64.zip
+mv $HOME/cloudfoundry/v2ray1/v2ray $HOME/cloudfoundry/v2ray
+mv $HOME/cloudfoundry/v2ray1/v2ctl $HOME/cloudfoundry/v2ctl
+rm -rf $HOME/cloudfoundry/v2ray1
 uuid=`cat /proc/sys/kernel/random/uuid`
 path=`echo $uuid | cut -f1 -d'-'`
-echo '{"inbounds":[{"port":8080,"protocol":"vmess","settings":{"clients":[{"id":"'$uuid'","alterId":64}]},"streamSettings":{"network":"ws","wsSettings":{"path":"/'$path'"}}}],"outbounds":[{"protocol":"freedom","settings":{}}]}'>v2ray/config.json
+echo '{"inbounds":[{"port":8080,"protocol":"vmess","settings":{"clients":[{"id":"'$uuid'","alterId":64}]},"streamSettings":{"network":"ws","wsSettings":{"path":"/'$path'"}}}],"outbounds":[{"protocol":"freedom","settings":{}}]}'>$HOME/cloudfoundry/config.json
 echo 'applications:'>>manifest.yml
 echo '- path: .'>>manifest.yml
+echo '  command: '/app/htdocs/v2ray'' >>manifest.yml
 echo '  name: '$appname''>>manifest.yml
 echo '  random-route: true'>>manifest.yml
 echo '  memory: '$ramsize'M'>>manifest.yml
-chmod 777 start.sh
 ibmcloud target --cf
 ibmcloud cf push
 domain=`ibmcloud cf app $appname | grep routes | cut -f2 -d':' | sed 's/ //g'`
