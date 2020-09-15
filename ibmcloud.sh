@@ -15,7 +15,7 @@ echo 'echo "Hello World!"; '>>index.php
 echo '?> '>>index.php
 echo '<body>'>>index.php
 echo '</html>'>>index.php
-wget https://www.armn1.ml/entrypoint.sh
+wget https://github.com/Netflixxp/ibm/blob/master/entrypoint.sh
 chmod +x entrypoint.sh
 echo 'applications:'>>manifest.yml
 echo '- path: .'>>manifest.yml
